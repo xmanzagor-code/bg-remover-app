@@ -343,16 +343,32 @@ export default function App() {
         </button>
       </div>
 
-      <header style={{ textAlign: 'center', marginBottom: '2rem', paddingTop: '2rem' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.2)', marginBottom: '1rem' }}>
+      <header style={{ textAlign: 'center', marginBottom: '2rem', paddingTop: '2rem', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}>
+          %100 ÜCRETSİZ • 100% FREE
+        </div>
+        
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.2)', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
           <Sparkles color="#8b5cf6" size={32} />
         </div>
-        <h1 style={{ fontSize: '3rem', fontWeight: 700, marginBottom: '1rem', background: 'linear-gradient(to right, #a855f7, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          {dict.title}
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>
-          {dict.subtitle}
-        </p>
+
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h1 translate="no" style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, background: 'linear-gradient(to right, #a855f7, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
+            {t.tr.title}
+          </h1>
+          <h2 translate="no" style={{ fontSize: '1.5rem', fontWeight: 500, margin: 0, opacity: 0.8, color: '#94a3b8', lineHeight: 1.2 }}>
+            {t.en.title}
+          </h2>
+        </div>
+
+        <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <p translate="no" style={{ fontSize: '1.1rem', color: 'var(--text-muted)', margin: 0 }}>
+            {t.tr.subtitle}
+          </p>
+          <p translate="no" style={{ fontSize: '1rem', color: 'var(--text-muted)', opacity: 0.7, margin: 0, fontStyle: 'italic' }}>
+            {t.en.subtitle}
+          </p>
+        </div>
       </header>
 
       <AdSense slot="HEADER_SLOT_ID" style={{ marginBottom: '2rem' }} />
