@@ -1,6 +1,6 @@
 import { removeBackground } from '@imgly/background-removal';
 
-const MAX_MOBILE_DIMENSION = 1500;
+const MAX_MOBILE_DIMENSION = 1000;
 
 export const processImage = async (
   imageSource: Blob | string,
