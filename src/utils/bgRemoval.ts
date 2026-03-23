@@ -16,7 +16,7 @@ export const processImage = async (
       // but 'auto' is generally preferred unless it fails. 
       // We'll stick to defaults but add error logging details.
       debug: true,
-      model: 'medium' // 'medium' is usually the best balance for mobile
+      model: 'isnet_fp16' // Optimized for mobile memory
     });
     return blob;
   } catch (error) {
