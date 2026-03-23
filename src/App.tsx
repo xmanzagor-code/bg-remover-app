@@ -398,7 +398,7 @@ export default function App() {
           boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
           whiteSpace: 'nowrap'
         }}>
-          %100 ÜCRETSİZ • 100% FREE
+          STANDART ÜCRETSİZ • STANDARD FREE
         </div>
         
         <button className="button-secondary" onClick={toggleLang} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -707,7 +707,7 @@ export default function App() {
                 <button 
                   className="button-primary" 
                   style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', padding: '1rem', fontWeight: 700 }}
-                  onClick={() => alert('Ödeme sistemi çok yakında! / Payment system coming soon!')}
+                  onClick={() => window.open(PREMIUM_PAYMENT_URL, '_blank')}
                 >
                   {dict.premiumUnlock}
                 </button>
