@@ -53,9 +53,9 @@ export const getAllRecords = async (): Promise<HistoryRecord[]> => {
   });
 };
 
-export const cleanupOldRecords = async (days: number): Promise<number> => {
+export const cleanupOldRecords = async (minutes: number): Promise<number> => {
   const db = await initDB();
-  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const cutoff = Date.now() - minutes * 60 * 1000;
   
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(STORE_NAME, 'readwrite');
