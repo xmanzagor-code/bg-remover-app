@@ -394,6 +394,12 @@ export default function App() {
     if (confirmDelete) {
       await deleteRecord(id);
       setHistory(prev => prev.filter(item => item.id !== id));
+      if (activeItem?.id === id) {
+        setActiveItem(null);
+      }
+    }
+  };
+
   const formatPriceLabel = (usdStr: string) => {
     const usd = parseFloat(usdStr.replace('$', ''));
     if (isNaN(usd)) return usdStr;
