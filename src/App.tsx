@@ -394,10 +394,11 @@ export default function App() {
     if (confirmDelete) {
       await deleteRecord(id);
       setHistory(prev => prev.filter(item => item.id !== id));
-      if (activeItem?.id === id) {
-        setActiveItem(null); // If the deleted item was active, clear active item
-      }
-    }
+  const formatPriceLabel = (usdStr: string) => {
+    const usd = parseFloat(usdStr.replace('$', ''));
+    if (isNaN(usd)) return usdStr;
+    const tl = (usd * usdToTry).toFixed(2);
+    return `${usdStr} (~${tl} TL)`;
   };
 
   return (
