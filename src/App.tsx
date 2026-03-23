@@ -125,8 +125,18 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
   );
 };
 
-// Configuration
-const PREMIUM_PAYMENT_URL = "https://iyzi.link/PLACEHOLDER"; // TODO: Buraya kendi iyzico linkinizi yapıştırın
+// Configuration - Her çözünürlük için ayrı iyzico linklerinizi buraya ekleyin
+const PREMIUM_LINKS: Record<number, string> = {
+  2: "https://iyzi.link/2X_HLD_PLACEHOLDER", // 2x ($1)
+  4: "https://iyzi.link/4X_HLD_PLACEHOLDER", // 4x ($1.5)
+  8: "https://iyzi.link/8X_HLD_PLACEHOLDER"  // 8x ($2)
+};
+
+const PREMIUM_PRICES: Record<number, string> = {
+  2: "$1",
+  4: "$1.5",
+  8: "$2"
+};
 
 export default function App() {
   const [lang, setLang] = useState<'tr' | 'en'>('tr');
@@ -562,16 +572,16 @@ export default function App() {
                   onChange={(e) => setDownloadScale(Number(e.target.value))}
                   disabled={isDownloading}
                 >
-                  <option value={1}>{dict.scale1}</option>
-                  <option value={2}>{dict.scale2} {dict.proLabel}</option>
-                  <option value={4}>{dict.scale4} {dict.proLabel}</option>
-                  <option value={8}>{dict.scale8} {dict.proLabel}</option>
+                  <option value={1}>{dict.scale1} (Ücretsiz)</option>
+                  <option value={2}>{dict.scale2} ($1)</option>
+                  <option value={4}>{dict.scale4} ($1.5)</option>
+                  <option value={8}>{dict.scale8} ($2)</option>
                 </select>
                 <button className="button-primary download-btn" onClick={handleDownload} disabled={isDownloading}>
                   {isDownloading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
                   {isDownloading ? dict.saving : (
                     downloadScale > 1 
-                      ? <>{dict.premiumUnlock}</>
+                      ? <>{dict.premiumUnlock} ({PREMIUM_PRICES[downloadScale]})</>
                       : <>{dict.saveBtn} (1x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>FREE</span></>
                   )}
                 </button>
@@ -710,9 +720,9 @@ export default function App() {
                 <button 
                   className="button-primary" 
                   style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', padding: '1rem', fontWeight: 700 }}
-                  onClick={() => window.open(PREMIUM_PAYMENT_URL, '_blank')}
+                  onClick={() => window.open(PREMIUM_LINKS[downloadScale], '_blank')}
                 >
-                  {dict.premiumUnlock}
+                  {dict.premiumUnlock} ({PREMIUM_PRICES[downloadScale]})
                 </button>
                 <button 
                   className="button-secondary" 
