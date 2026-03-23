@@ -476,7 +476,7 @@ export default function App() {
                 </select>
                 <button className="button-primary download-btn" onClick={handleDownload} disabled={isDownloading}>
                   {isDownloading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
-                  {isDownloading ? dict.saving : `${dict.saveBtn} (${downloadScale}x)`}
+                  {isDownloading ? dict.saving : <>{dict.saveBtn} ({downloadScale}x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>%100 FREE</span></>}
                 </button>
               </div>
             </div>
