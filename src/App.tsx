@@ -500,7 +500,10 @@ export default function App() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#6366f1' }}>
-            <Download size={24} />
+            <div style={{ position: 'relative' }}>
+              <Download size={24} />
+              <span style={{ position: 'absolute', top: '-10px', right: '-15px', background: '#f59e0b', color: 'black', fontSize: '0.6rem', padding: '1px 4px', borderRadius: '4px', fontWeight: 800 }}>PRO</span>
+            </div>
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>HD İNDİRME</div>
               <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>HD DOWNLOAD</div>
@@ -645,6 +648,76 @@ export default function App() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Premium Modal */}
+        {showPremiumModal && (
+          <div style={{ 
+            position: 'fixed', 
+            inset: 0, 
+            backgroundColor: 'rgba(0,0,0,0.85)', 
+            backdropFilter: 'blur(8px)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            zIndex: 1000,
+            padding: '1rem'
+          }}>
+            <div className="glass-panel" style={{ 
+              maxWidth: '450px', 
+              width: '100%', 
+              padding: '2.5rem', 
+              textAlign: 'center', 
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+            }}>
+              <div style={{ 
+                background: 'rgba(245, 158, 11, 0.15)', 
+                width: '70px', 
+                height: '70px', 
+                borderRadius: '50%', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                margin: '0 auto 1.5rem' 
+              }}>
+                <Sparkles size={36} color="#f59e0b" />
+              </div>
+              
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem', background: 'linear-gradient(to right, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                {dict.premiumTitle}
+              </h2>
+              
+              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', lineHeight: 1.5 }}>
+                {dict.premiumDesc}
+              </p>
+              
+              <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2.5rem' }}>
+                {dict.premiumFeatures.map((feat, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
+                    <CheckCircle size={18} color="#10b981" />
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <button 
+                  className="button-primary" 
+                  style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', padding: '1rem', fontWeight: 700 }}
+                  onClick={() => alert('Ödeme sistemi çok yakında! / Payment system coming soon!')}
+                >
+                  {dict.premiumUnlock}
+                </button>
+                <button 
+                  className="button-secondary" 
+                  onClick={() => setShowPremiumModal(false)}
+                >
+                  {dict.cancel}
+                </button>
+              </div>
             </div>
           </div>
         )}
