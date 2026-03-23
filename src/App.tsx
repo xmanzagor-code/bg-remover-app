@@ -423,6 +423,31 @@ export default function App() {
           </div>
         )}
 
+        {/* 100% Free & Private Features Card */}
+        <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '2rem', justifyContent: 'center', margin: '2rem auto', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#10b981' }}>
+            <ShieldCheck size={24} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>%100 ÜCRETSİZ & GİZLİ</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>100% FREE & PRIVATE</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#8b5cf6' }}>
+            <Sparkles size={24} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>SINIRSIZ KULLANIM</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>UNLIMITED USE</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#6366f1' }}>
+            <Download size={24} />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>HD İNDİRME</div>
+              <div style={{ fontSize: '0.75rem', opacity: 0.8 }}>HD DOWNLOAD</div>
+            </div>
+          </div>
+        </div>
+
         {/* Step 2: Confirmation / Staged Preview */}
         {stagedUrl && !activeItem && (
           <div className="glass-panel" style={{ width: '100%', maxWidth: '800px', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem' }}>
@@ -446,7 +471,9 @@ export default function App() {
               </button>
               <button className="button-primary button-sparkle" onClick={startProcessing} disabled={isProcessing}>
                 <Sparkles size={20} />
-                {isProcessing ? dict.processingWait : dict.removeBtn}
+                {isProcessing ? dict.processingWait : (
+                  <>{dict.removeBtn} <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>%100 FREE</span></>
+                )}
               </button>
             </div>
           </div>
