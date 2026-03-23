@@ -285,9 +285,10 @@ export default function App() {
       setStagedFile(null);
       setStagedUrl(null);
       setProgressMsg('');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert(dict.error);
+      const detail = error?.message || '';
+      alert(`${dict.error}${detail ? `\n\nDetay: ${detail}` : ''}`);
     } finally {
       setIsProcessing(false);
     }

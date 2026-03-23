@@ -15,7 +15,7 @@ export const processImage = async (
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Ultra-light configuration for mobile stability
+    // Maximum compatibility configuration
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,7 +23,8 @@ export const processImage = async (
         }
       },
       debug: true,
-      model: 'isnet_quint8' // Lightest model available for extreme compatibility
+      device: 'cpu', // Force CPU to avoid WebGL driver crashes on non-standard Android (Vivo/Oppo/etc)
+      model: 'isnet_quint8'
     });
     return blob;
   } catch (error: any) {
