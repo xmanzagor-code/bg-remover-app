@@ -1,4 +1,3 @@
-```
 import { removeBackground } from '@imgly/background-removal';
 
 const MAX_MOBILE_DIMENSION = 1024;
