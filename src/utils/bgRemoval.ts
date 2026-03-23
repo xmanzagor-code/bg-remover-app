@@ -15,7 +15,7 @@ export const processImage = async (
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Ultra-light configuration for non-isolated mode
+    // Standard configuration - Using explicit publicPath for Non-Isolated reliability
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,8 +23,8 @@ export const processImage = async (
         }
       },
       debug: true,
-      model: 'isnet_quint8',
-      device: 'cpu'
+      model: 'isnet_fp16',
+      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/'
     });
     return blob;
   } catch (error: any) {
