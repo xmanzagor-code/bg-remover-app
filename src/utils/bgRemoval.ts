@@ -15,7 +15,7 @@ export const processImage = async (
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Extreme resilience configuration
+    // Extreme resilience configuration - Explicit publicPath and concurrency
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,8 +23,10 @@ export const processImage = async (
         }
       },
       debug: true,
-      device: 'cpu', // Back to CPU for maximum stability on Vivo
-      model: 'isnet' 
+      device: 'cpu',
+      model: 'isnet',
+      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/',
+      concurrency: 1 // Single thread to prevent OOM/Aborts on mobile
     });
     return blob;
   } catch (error: any) {
