@@ -15,7 +15,7 @@ export const processImage = async (
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Maximum compatibility configuration
+    // Optimized configuration for Isolated: Yes, SAB: Yes
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,8 +23,8 @@ export const processImage = async (
         }
       },
       debug: true,
-      device: 'cpu', // Force CPU to avoid WebGL driver crashes on non-standard Android (Vivo/Oppo/etc)
-      model: 'isnet_quint8'
+      device: 'auto', // Back to auto as isolation is confirmed
+      model: 'isnet_fp16'
     });
     return blob;
   } catch (error: any) {
@@ -37,6 +37,7 @@ export const processImage = async (
 };
 
 async function resizeImageIfNeeded(blob: Blob, maxDim: number): Promise<Blob> {
+  console.log("Resizing check:", blob.size, "Max:", maxDim);
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(blob);
@@ -44,22 +45,31 @@ async function resizeImageIfNeeded(blob: Blob, maxDim: number): Promise<Blob> {
     img.onload = () => {
       URL.revokeObjectURL(url);
       if (img.width <= maxDim && img.height <= maxDim) {
+        console.log("No resize needed:", img.width, "x", img.height);
         resolve(blob);
         return;
       }
 
+      console.log("Resizing from:", img.width, "x", img.height);
       const ratio = Math.min(maxDim / img.width, maxDim / img.height);
       const canvas = document.createElement('canvas');
       canvas.width = img.width * ratio;
       canvas.height = img.height * ratio;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
+        console.error("Canvas context failed");
         resolve(blob);
         return;
       }
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((result) => resolve(result || blob), 'image/jpeg', 0.9);
+      canvas.toBlob((result) => {
+        if (result) console.log("Resized to:", result.size);
+        resolve(result || blob);
+      }, 'image/jpeg', 0.9);
     };
-    img.onerror = () => resolve(blob);
+    img.onerror = (e) => {
+      console.error("Image load failed for resize:", e);
+      resolve(blob);
+    };
   });
 }
