@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { DragEvent, ChangeEvent } from 'react';
-import { UploadCloud, Image as ImageIcon, Download, RefreshCw, Sparkles, Loader2, CheckCircle, History, Globe, ShieldCheck, Trash2 } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Download, RefreshCw, Sparkles, Loader2, CheckCircle, History, Globe, ShieldCheck, Trash2, Share2 } from 'lucide-react';
 import { processImage } from './utils/bgRemoval';
 import { saveRecord, getAllRecords, cleanupOldRecords, deleteRecord } from './utils/db';
 
@@ -42,6 +42,7 @@ const t = {
     scale2: "2x HD",
     scale4: "4x Ultra",
     scale8: "8x Maksimum",
+    shareBtn: "Paylaş / Kaydet",
   },
   en: {
     title: "Magic Background Remover",
@@ -73,6 +74,7 @@ const t = {
     scale2: "2x HD",
     scale4: "4x Ultra",
     scale8: "8x Maximum",
+    shareBtn: "Share / Save",
   }
 };
 
@@ -312,6 +314,28 @@ export default function App() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const handleShare = async () => {
+    if (!activeItem || !navigator.share) return;
+    
+    try {
+      const response = await fetch(activeItem.resultUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'result.png', { type: 'image/png' });
+      
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Magic Background Remover',
+          text: 'Arka planı silinmiş görselim!',
+        });
+      } else {
+        triggerDownload(activeItem.resultUrl, 'result.png');
+      }
+    } catch (err) {
+      console.error('Paylaşım hatası:', err);
+    }
   };
 
   const toggleLang = () => {
