@@ -1,6 +1,7 @@
+```
 import { removeBackground } from '@imgly/background-removal';
 
-const MAX_MOBILE_DIMENSION = 480;
+const MAX_MOBILE_DIMENSION = 1024;
 
 export const processImage = async (
   imageSource: Blob | string,
@@ -9,23 +10,20 @@ export const processImage = async (
   try {
     let source = imageSource;
 
-    // Mobile check & auto-resize - Drastic 480px limit for memory
+    // Mobile check & auto-resize - Reasonable 1024px limit
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile && imageSource instanceof Blob) {
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Extreme resilience configuration - Explicit publicPath and concurrency
+    // Default configuration for maximum compatibility (Non-Isolated)
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
           onProgress(key, current, total);
         }
       },
-      debug: true,
-      device: 'cpu',
-      model: 'isnet_quint8',
-      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/'
+      debug: true
     });
     return blob;
   } catch (error: any) {
