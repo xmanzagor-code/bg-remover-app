@@ -1,3 +1,5 @@
+import { removeBackground } from '@imgly/background-removal';
+
 const MAX_MOBILE_DIMENSION = 480;
 
 export const processImage = async (
