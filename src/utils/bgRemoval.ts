@@ -1,6 +1,6 @@
 import { removeBackground } from '@imgly/background-removal';
 
-const MAX_MOBILE_DIMENSION = 640;
+const MAX_MOBILE_DIMENSION = 480;
 
 export const processImage = async (
   imageSource: Blob | string,
@@ -9,13 +9,13 @@ export const processImage = async (
   try {
     let source = imageSource;
 
-    // Mobile check & auto-resize to prevent OOM
+    // Mobile check & auto-resize - Drastic 480px limit for memory
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (isMobile && imageSource instanceof Blob) {
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Optimized configuration for Isolated: Yes, SAB: Yes
+    // Extreme resilience configuration
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,8 +23,8 @@ export const processImage = async (
         }
       },
       debug: true,
-      device: undefined, // Let the library auto-detect (gpu/cpu)
-      model: 'isnet_fp16'
+      device: 'cpu', // Back to CPU for maximum stability on Vivo
+      model: 'isnet' 
     });
     return blob;
   } catch (error: any) {
