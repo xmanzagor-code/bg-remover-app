@@ -549,6 +549,16 @@ export default function App() {
                   {isDownloading ? dict.saving : <>{dict.saveBtn} ({downloadScale}x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>%100 FREE</span></>}
                 </button>
               </div>
+
+              {typeof navigator.share === 'function' && (
+                <button 
+                  className="button-secondary" 
+                  onClick={handleShare}
+                  style={{ alignSelf: 'center', padding: '0.75rem 1.5rem', background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.3)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                >
+                  <Share2 size={18} /> {dict.shareBtn} (Galeriye Kaydet)
+                </button>
+              )}
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', width: '100%', justifyContent: 'center' }}>
