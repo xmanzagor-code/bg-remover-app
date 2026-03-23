@@ -29,8 +29,8 @@ export const processImage = async (
     return blob;
   } catch (error: any) {
     console.error('Core error removing background:', error);
-    // Provide a more descriptive error for the UI if possible
-    const detailedMsg = error?.message || 'WASM/Memory Error';
+    const isIsolated = typeof window !== 'undefined' && window.crossOriginIsolated ? 'Yes' : 'No';
+    const detailedMsg = (error?.message || 'WASM/Memory Error') + ` (Isolated: ${isIsolated})`;
     throw new Error(detailedMsg);
   }
 };
