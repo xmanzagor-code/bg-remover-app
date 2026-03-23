@@ -103,6 +103,8 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
     <div className="ad-wrapper" style={{ 
       width: '100%', 
       minHeight: '100px', 
+      minWidth: '300px',
+      width: '100%',
       background: 'rgba(255,255,255,0.02)', 
       border: '1px dashed rgba(255,255,255,0.1)',
       borderRadius: '12px',
@@ -112,7 +114,7 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
       color: 'rgba(255,255,255,0.2)',
       fontSize: '0.8rem',
       overflow: 'hidden',
-      margin: '1rem 0',
+      margin: '1.5rem 0',
       ...style
     }}>
       <ins className="adsbygoogle"
