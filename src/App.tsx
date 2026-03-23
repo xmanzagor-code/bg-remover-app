@@ -335,28 +335,47 @@ export default function App() {
   return (
     <div key={lang} className="app-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
-      {/* Language Toggle */}
-      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 100 }}>
+      {/* Top Bar for Language & Free Badge */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        width: '100%', 
+        padding: '1rem 0', 
+        marginBottom: '1rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div style={{ 
+          background: 'linear-gradient(135deg, #10b981, #059669)', 
+          color: 'white', 
+          padding: '6px 14px', 
+          borderRadius: '12px', 
+          fontSize: '0.8rem', 
+          fontWeight: 700, 
+          letterSpacing: '0.05em', 
+          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+          whiteSpace: 'nowrap'
+        }}>
+          %100 ÜCRETSİZ • 100% FREE
+        </div>
+        
         <button className="button-secondary" onClick={toggleLang} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Globe size={16} />
           {lang === 'tr' ? 'Switch to English' : 'Türkçe\'ye Geç'}
         </button>
       </div>
 
-      <header style={{ textAlign: 'center', marginBottom: '2rem', paddingTop: '2rem', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: '0', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)' }}>
-          %100 ÜCRETSİZ • 100% FREE
-        </div>
-        
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.2)', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
+      <header style={{ textAlign: 'center', marginBottom: '2.5rem', paddingTop: '1rem' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.2)', marginBottom: '1.5rem' }}>
           <Sparkles color="#8b5cf6" size={32} />
         </div>
 
         <div style={{ marginBottom: '1.5rem' }}>
-          <h1 translate="no" style={{ fontSize: '2.5rem', fontWeight: 700, margin: 0, background: 'linear-gradient(to right, #a855f7, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
+          <h1 translate="no" style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 700, margin: 0, background: 'linear-gradient(to right, #a855f7, #6366f1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.2 }}>
             {t.tr.title}
           </h1>
-          <h2 translate="no" style={{ fontSize: '1.5rem', fontWeight: 500, margin: 0, opacity: 0.8, color: '#94a3b8', lineHeight: 1.2 }}>
+          <h2 translate="no" style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', fontWeight: 500, margin: 0, opacity: 0.8, color: '#94a3b8', lineHeight: 1.2, marginTop: '0.5rem' }}>
             {t.en.title}
           </h2>
         </div>
