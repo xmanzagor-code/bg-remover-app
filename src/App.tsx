@@ -333,13 +333,13 @@ export default function App() {
   };
 
   return (
-    <div className="app-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div key={lang} className="app-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       {/* Language Toggle */}
       <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 100 }}>
         <button className="button-secondary" onClick={toggleLang} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Globe size={16} />
-          {lang === 'tr' ? 'English' : 'Türkçe'}
+          {lang === 'tr' ? 'Switch to English' : 'Türkçe\'ye Geç'}
         </button>
       </div>
 
