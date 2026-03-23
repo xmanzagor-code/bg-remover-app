@@ -43,6 +43,11 @@ const t = {
     scale4: "4x Ultra",
     scale8: "8x Maksimum",
     shareBtn: "Paylaş / Kaydet",
+    premiumTitle: "Premium'a Geçin",
+    premiumDesc: "HD, Ultra ve Maksimum çözünürlükte indirme yapmak için Premium üye olmalısınız.",
+    premiumFeatures: ["Yüksek Çözünürlük (8x'e kadar)", "Sınırsız İşlem", "Reklamsız Deneyim"],
+    premiumUnlock: "Premium'u Kilidini Aç",
+    proLabel: "(PRO)",
   },
   en: {
     title: "Magic Background Remover",
@@ -75,6 +80,11 @@ const t = {
     scale4: "4x Ultra",
     scale8: "8x Maximum",
     shareBtn: "Share / Save",
+    premiumTitle: "Go Premium",
+    premiumDesc: "Upgrade to Premium to download in HD, Ultra, and Maximum resolutions.",
+    premiumFeatures: ["High Resolution (up to 8x)", "Unlimited Processing", "Ad-Free Experience"],
+    premiumUnlock: "Unlock Premium",
+    proLabel: "(PRO)",
   }
 };
 
@@ -136,6 +146,7 @@ export default function App() {
   // Settings
   const [downloadScale, setDownloadScale] = useState<number>(1);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -262,6 +273,12 @@ export default function App() {
     const scale = downloadScale;
 
     try {
+      if (scale > 1) {
+        setShowPremiumModal(true);
+        setIsDownloading(false);
+        return;
+      }
+
       if (scale === 1) {
         triggerDownload(url, 'transparent-1x.png');
         setIsDownloading(false);
@@ -540,13 +557,17 @@ export default function App() {
                   disabled={isDownloading}
                 >
                   <option value={1}>{dict.scale1}</option>
-                  <option value={2}>{dict.scale2}</option>
-                  <option value={4}>{dict.scale4}</option>
-                  <option value={8}>{dict.scale8}</option>
+                  <option value={2}>{dict.scale2} {dict.proLabel}</option>
+                  <option value={4}>{dict.scale4} {dict.proLabel}</option>
+                  <option value={8}>{dict.scale8} {dict.proLabel}</option>
                 </select>
                 <button className="button-primary download-btn" onClick={handleDownload} disabled={isDownloading}>
                   {isDownloading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
-                  {isDownloading ? dict.saving : <>{dict.saveBtn} ({downloadScale}x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>%100 FREE</span></>}
+                  {isDownloading ? dict.saving : (
+                    downloadScale > 1 
+                      ? <>{dict.premiumUnlock}</>
+                      : <>{dict.saveBtn} (1x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>FREE</span></>
+                  )}
                 </button>
               </div>
 
