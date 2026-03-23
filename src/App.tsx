@@ -363,7 +363,7 @@ export default function App() {
   };
 
   const handleShare = async () => {
-    if (!activeItem || !navigator.share) return;
+    if (!activeItem || !navigator.share || downloadScale !== 1) return;
     
     try {
       const response = await fetch(activeItem.resultUrl);
@@ -610,7 +610,7 @@ export default function App() {
                 </button>
               </div>
 
-              {typeof navigator.share === 'function' && (
+              {downloadScale === 1 && typeof navigator.share === 'function' && (
                 <button 
                   className="button-secondary" 
                   onClick={handleShare}
