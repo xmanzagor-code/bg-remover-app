@@ -1,6 +1,6 @@
 import { removeBackground } from '@imgly/background-removal';
 
-const MAX_MOBILE_DIMENSION = 800;
+const MAX_MOBILE_DIMENSION = 640;
 
 export const processImage = async (
   imageSource: Blob | string,
@@ -30,7 +30,8 @@ export const processImage = async (
   } catch (error: any) {
     console.error('Core error removing background:', error);
     const isIsolated = typeof window !== 'undefined' && window.crossOriginIsolated ? 'Yes' : 'No';
-    const detailedMsg = (error?.message || 'WASM/Memory Error') + ` (Isolated: ${isIsolated})`;
+    const hasSAB = typeof SharedArrayBuffer !== 'undefined' ? 'Yes' : 'No';
+    const detailedMsg = (error?.message || 'WASM/Memory Error') + ` (Isolated: ${isIsolated}, SAB: ${hasSAB})`;
     throw new Error(detailedMsg);
   }
 };
