@@ -125,6 +125,9 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
   );
 };
 
+// Configuration
+const PREMIUM_PAYMENT_URL = "https://iyzi.link/PLACEHOLDER"; // TODO: Buraya kendi iyzico linkinizi yapıştırın
+
 export default function App() {
   const [lang, setLang] = useState<'tr' | 'en'>('tr');
   const dict = t[lang];
