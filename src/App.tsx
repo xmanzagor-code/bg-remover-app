@@ -104,7 +104,6 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
       width: '100%', 
       minHeight: '100px', 
       minWidth: '300px',
-      width: '100%',
       background: 'rgba(255,255,255,0.02)', 
       border: '1px dashed rgba(255,255,255,0.1)',
       borderRadius: '12px',
