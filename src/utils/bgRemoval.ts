@@ -23,7 +23,7 @@ export const processImage = async (
         }
       },
       debug: true,
-      device: 'auto', // Back to auto as isolation is confirmed
+      device: undefined, // Let the library auto-detect (gpu/cpu)
       model: 'isnet_fp16'
     });
     return blob;
