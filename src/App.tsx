@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import type { DragEvent, ChangeEvent } from 'react';
-import { UploadCloud, Image as ImageIcon, Download, RefreshCw, Sparkles, Loader2, CheckCircle, History, Globe, ShieldCheck } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Download, RefreshCw, Sparkles, Loader2, CheckCircle, History, Globe, ShieldCheck, Trash2 } from 'lucide-react';
 import { processImage } from './utils/bgRemoval';
-import { saveRecord, getAllRecords, cleanupOldRecords } from './utils/db';
+import { saveRecord, getAllRecords, cleanupOldRecords, deleteRecord } from './utils/db';
 
 type HistoryItem = {
   id: string;
@@ -313,6 +313,20 @@ export default function App() {
     setLang(lang === 'tr' ? 'en' : 'tr');
   };
 
+  const handleDelete = async (id: string) => {
+    const confirmDelete = lang === 'tr' 
+      ? window.confirm("Bu kaydı silmek istediğinizden emin misiniz?") 
+      : window.confirm("Are you sure you want to delete this record?");
+    
+    if (confirmDelete) {
+      await deleteRecord(id);
+      setHistory(prev => prev.filter(item => item.id !== id));
+      if (activeItem?.id === id) {
+        setActiveItem(null); // If the deleted item was active, clear active item
+      }
+    }
+  };
+
   return (
     <div className="app-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
@@ -496,9 +510,17 @@ export default function App() {
                   key={item.id} 
                   className={`glass-panel history-thumb ${activeItem?.id === item.id ? 'active' : ''}`}
                   onClick={() => { setActiveItem(item); setStagedUrl(null); }}
+                  style={{ position: 'relative' }}
                 >
                   <img src={item.resultUrl} alt="history item" />
                   <div className="history-overlay">{dict.view}</div>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                    className="history-delete-btn"
+                    title={lang === 'tr' ? 'Sil' : 'Delete'}
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               ))}
             </div>

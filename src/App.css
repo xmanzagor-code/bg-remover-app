@@ -1,1 +1,35 @@
 /* Custom styles are in index.css */
+
+.history-thumb:hover .history-overlay {
+  opacity: 1;
+}
+
+.history-delete-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.85);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.2s ease;
+}
+
+.history-thumb:hover .history-delete-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.history-delete-btn:hover {
+  background: #ef4444;
+  transform: scale(1.1);
+}
