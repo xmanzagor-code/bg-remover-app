@@ -160,11 +160,25 @@ export default function App() {
   const [downloadScale, setDownloadScale] = useState<number>(1);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [usdToTry, setUsdToTry] = useState<number>(44.3); // Safe fallback
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load history from IndexedDB on mount
   useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await res.json();
+        if (data && data.rates && data.rates.TRY) {
+          setUsdToTry(data.rates.TRY);
+        }
+      } catch (err) {
+        console.error("Exchange rate fetch failed:", err);
+      }
+    };
+    fetchRate();
+    
     // Dynamically update HTML lang attribute to prevent browser auto-translate conflicts
     document.documentElement.lang = lang;
   }, [lang]);
@@ -573,15 +587,15 @@ export default function App() {
                   disabled={isDownloading}
                 >
                   <option value={1}>{dict.scale1} (Ücretsiz)</option>
-                  <option value={2}>{dict.scale2} ($1)</option>
-                  <option value={4}>{dict.scale4} ($1.5)</option>
-                  <option value={8}>{dict.scale8} ($2)</option>
+                  <option value={2}>{dict.scale2} ({formatPriceLabel(PREMIUM_PRICES[2])})</option>
+                  <option value={4}>{dict.scale4} ({formatPriceLabel(PREMIUM_PRICES[4])})</option>
+                  <option value={8}>{dict.scale8} ({formatPriceLabel(PREMIUM_PRICES[8])})</option>
                 </select>
                 <button className="button-primary download-btn" onClick={handleDownload} disabled={isDownloading}>
                   {isDownloading ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
                   {isDownloading ? dict.saving : (
                     downloadScale > 1 
-                      ? <>{dict.premiumUnlock} ({PREMIUM_PRICES[downloadScale]})</>
+                      ? <>{dict.premiumUnlock} ({formatPriceLabel(PREMIUM_PRICES[downloadScale])})</>
                       : <>{dict.saveBtn} (1x) <span style={{ fontSize: '0.7rem', opacity: 0.8, marginLeft: '5px', background: 'rgba(255,255,255,0.2)', padding: '2px 6px', borderRadius: '4px' }}>FREE</span></>
                   )}
                 </button>
@@ -722,7 +736,7 @@ export default function App() {
                   style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', padding: '1rem', fontWeight: 700 }}
                   onClick={() => window.open(PREMIUM_LINKS[downloadScale], '_blank')}
                 >
-                  {dict.premiumUnlock} ({PREMIUM_PRICES[downloadScale]})
+                  {dict.premiumUnlock} ({formatPriceLabel(PREMIUM_PRICES[downloadScale])})
                 </button>
                 <button 
                   className="button-secondary" 
