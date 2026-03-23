@@ -24,9 +24,8 @@ export const processImage = async (
       },
       debug: true,
       device: 'cpu',
-      model: 'isnet',
-      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/',
-      concurrency: 1 // Single thread to prevent OOM/Aborts on mobile
+      model: 'isnet_quint8',
+      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/'
     });
     return blob;
   } catch (error: any) {
