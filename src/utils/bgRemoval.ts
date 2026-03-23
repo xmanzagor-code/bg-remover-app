@@ -15,7 +15,7 @@ export const processImage = async (
       source = await resizeImageIfNeeded(imageSource, MAX_MOBILE_DIMENSION);
     }
 
-    // Standard configuration - Using explicit publicPath for Non-Isolated reliability
+    // Standard configuration - Using UNPKG as a fallback CDN for better compatibility
     const blob = await removeBackground(source, {
       progress: (key: string, current: number, total: number) => {
         if (onProgress) {
@@ -23,8 +23,8 @@ export const processImage = async (
         }
       },
       debug: true,
-      model: 'isnet_fp16',
-      publicPath: 'https://static.img.ly/packages/@imgly/background-removal-data/1.7.0/dist/'
+      model: 'isnet_quint8',
+      publicPath: 'https://unpkg.com/@imgly/background-removal-data@1.7.0/dist/'
     });
     return blob;
   } catch (error: any) {
