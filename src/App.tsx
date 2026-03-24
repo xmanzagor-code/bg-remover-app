@@ -126,17 +126,13 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
   );
 };
 
-// Configuration - Her çözünürlük için ayrı iyzico linklerinizi buraya ekleyin
-const PREMIUM_LINKS: Record<number, string> = {
-  2: "https://iyzi.link/2X_HLD_PLACEHOLDER", // 2x ($1)
-  4: "https://iyzi.link/4X_HLD_PLACEHOLDER", // 4x ($1.5)
-  8: "https://iyzi.link/8X_HLD_PLACEHOLDER"  // 8x ($2)
-};
+// BEP20 USDT Ödeme Konfigürasyonu
+const USDT_WALLET = "0xaafb2b64355c2791af30a13f4da18f5081d1bb83"; // BEP20 USDT Cüzdan Adresi
 
-const PREMIUM_PRICES: Record<number, string> = {
-  2: "$1",
-  4: "$1.5",
-  8: "$2"
+const PREMIUM_PRICES: Record<number, number> = {
+  2: 1,
+  4: 1.5,
+  8: 2
 };
 
 export default function App() {
@@ -160,8 +156,13 @@ export default function App() {
   // Settings
   const [downloadScale, setDownloadScale] = useState<number>(1);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [usdToTry, setUsdToTry] = useState<number>(44.3); // Safe fallback
+  // BEP20 Payment state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentScale, setPaymentScale] = useState<number>(2);
+  const [txId, setTxId] = useState('');
+  const [txVerified, setTxVerified] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -303,7 +304,7 @@ export default function App() {
 
     try {
       if (scale > 1) {
-        setShowPremiumModal(true);
+        openPaymentModal(scale);
         setIsDownloading(false);
         return;
       }
@@ -402,11 +403,63 @@ export default function App() {
     }
   };
 
-  const formatPriceLabel = (usdStr: string) => {
-    const usd = parseFloat(usdStr.replace('$', ''));
-    if (isNaN(usd)) return usdStr;
-    const tl = (usd * usdToTry).toFixed(2);
-    return `${usdStr} (~${tl} TL)`;
+  const formatPriceLabel = (usd: number) => {
+    const tl = (usd * usdToTry).toFixed(0);
+    return `$${usd} (~${tl} ₺)`;
+  };
+
+  const openPaymentModal = (scale: number) => {
+    setPaymentScale(scale);
+    setTxId('');
+    setTxVerified(false);
+    setCopySuccess(false);
+    setShowPaymentModal(true);
+  };
+
+  const copyWallet = () => {
+    navigator.clipboard.writeText(USDT_WALLET).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    });
+  };
+
+  const verifyAndDownload = async () => {
+    // BEP20 TX hash: 0x + 64 hex characters = 66 chars
+    const isBscTx = /^0x[a-fA-F0-9]{64}$/.test(txId.trim());
+    if (!isBscTx) {
+      alert('Geçersiz TX Hash! BEP20 işlem hash\'i 0x ile başlar ve 66 karakter uzunluğundadır.\n\nInvalid TX Hash! BEP20 transaction hash starts with 0x and is 66 characters long.');
+      return;
+    }
+    setTxVerified(true);
+    // Trigger the actual HD download
+    if (!activeItem) return;
+    const url = activeItem.resultUrl;
+    const scale = paymentScale;
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = url;
+      await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const scaledUrl = URL.createObjectURL(blob);
+            triggerDownload(scaledUrl, `transparent-${scale}x.png`);
+            setTimeout(() => URL.revokeObjectURL(scaledUrl), 5000);
+          }
+        }, 'image/png', 1.0);
+      }
+    } catch {
+      triggerDownload(url, `transparent-${scale}x.png`);
+    }
+    setTimeout(() => setShowPaymentModal(false), 2000);
   };
 
   return (
@@ -676,7 +729,7 @@ export default function App() {
                     <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$1</div>
                     <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(1 * usdToTry).toFixed(0)} ₺</div>
                   </div>
-                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c3aed, #6366f1)', border: 'none', borderRadius: '10px' }} onClick={() => window.open(PREMIUM_LINKS[2], '_blank')}>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c3aed, #6366f1)', border: 'none', borderRadius: '10px' }} onClick={() => openPaymentModal(2)}>
                     Satın Al
                   </button>
                 </div>
@@ -690,7 +743,7 @@ export default function App() {
                     <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$1.5</div>
                     <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(1.5 * usdToTry).toFixed(0)} ₺</div>
                   </div>
-                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '10px', color: '#000', fontWeight: 700 }} onClick={() => window.open(PREMIUM_LINKS[4], '_blank')}>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '10px', color: '#000', fontWeight: 700 }} onClick={() => openPaymentModal(4)}>
                     Satın Al
                   </button>
                 </div>
@@ -703,14 +756,14 @@ export default function App() {
                     <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$2</div>
                     <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(2 * usdToTry).toFixed(0)} ₺</div>
                   </div>
-                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none', borderRadius: '10px' }} onClick={() => window.open(PREMIUM_LINKS[8], '_blank')}>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none', borderRadius: '10px' }} onClick={() => openPaymentModal(8)}>
                     Satın Al
                   </button>
                 </div>
               </div>
 
               <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', marginTop: '1rem', marginBottom: 0 }}>
-                💱 1 USD = {usdToTry.toFixed(2)} ₺ (anlık kur) • Ödeme Iyzico üzerinden güvenli
+                💱 1 USD = {usdToTry.toFixed(2)} ₺ (anlık kur) • Ödeme BEP20 USDT (BSC Ağı)
               </p>
             </div>
 
@@ -757,71 +810,89 @@ export default function App() {
         )}
 
         {/* Premium Modal */}
-        {showPremiumModal && (
-          <div style={{ 
-            position: 'fixed', 
-            inset: 0, 
-            backgroundColor: 'rgba(0,0,0,0.85)', 
-            backdropFilter: 'blur(8px)',
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            zIndex: 1000,
-            padding: '1rem'
-          }}>
-            <div className="glass-panel" style={{ 
-              maxWidth: '450px', 
-              width: '100%', 
-              padding: '2.5rem', 
-              textAlign: 'center', 
-              border: '1px solid rgba(245, 158, 11, 0.4)',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
-            }}>
-              <div style={{ 
-                background: 'rgba(245, 158, 11, 0.15)', 
-                width: '70px', 
-                height: '70px', 
-                borderRadius: '50%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                margin: '0 auto 1.5rem' 
-              }}>
-                <Sparkles size={36} color="#f59e0b" />
-              </div>
+        {/* BEP20 USDT Payment Modal */}
+        {showPaymentModal && (
+          <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+            <div className="glass-panel" style={{ maxWidth: '500px', width: '100%', padding: '2rem', border: '1px solid rgba(16, 185, 129, 0.4)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', maxHeight: '90vh', overflowY: 'auto' }}>
               
-              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem', background: 'linear-gradient(to right, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                {dict.premiumTitle}
-              </h2>
-              
-              <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', lineHeight: 1.5 }}>
-                {dict.premiumDesc}
-              </p>
-              
-              <div style={{ textAlign: 'left', background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2.5rem' }}>
-                {dict.premiumFeatures.map((feat, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', fontSize: '0.95rem' }}>
-                    <CheckCircle size={18} color="#10b981" />
-                    <span>{feat}</span>
+              {!txVerified ? (
+                <>
+                  <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>💎</div>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, marginBottom: '0.25rem' }}>
+                      USDT ile Öde & İndir
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                      BEP20 (BSC) ağı üzerinden ödeme yapın
+                    </p>
                   </div>
-                ))}
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <button 
-                  className="button-primary" 
-                  style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', padding: '1rem', fontWeight: 700 }}
-                  onClick={() => window.open(PREMIUM_LINKS[downloadScale], '_blank')}
-                >
-                  {dict.premiumUnlock} ({formatPriceLabel(PREMIUM_PRICES[downloadScale])})
-                </button>
-                <button 
-                  className="button-secondary" 
-                  onClick={() => setShowPremiumModal(false)}
-                >
-                  {dict.cancel}
-                </button>
-              </div>
+
+                  {/* Amount */}
+                  <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', padding: '1rem', textAlign: 'center', marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Ödenecek Tutar • Amount</div>
+                    <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{PREMIUM_PRICES[paymentScale]} USDT</div>
+                    <div style={{ fontSize: '0.8rem', color: '#f59e0b' }}>≈ {(PREMIUM_PRICES[paymentScale] * usdToTry).toFixed(0)} ₺ (anlık kur)</div>
+                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>{paymentScale}x HD İndirme</div>
+                  </div>
+
+                  {/* Network Warning */}
+                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '10px', padding: '0.75rem', marginBottom: '1.25rem', fontSize: '0.8rem', color: '#f59e0b', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1rem' }}>⚠️</span>
+                    <span><strong>Sadece BEP20 (BSC) ağını kullanın!</strong> Diğer ağlardan gönderilen USDT kaybolur.</span>
+                  </div>
+
+                  {/* Wallet Address */}
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>💳 BEP20 USDT Cüzdan Adresi</div>
+                    <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <code style={{ flex: 1, fontSize: '0.72rem', wordBreak: 'break-all', color: '#a78bfa', lineHeight: 1.4 }}>{USDT_WALLET}</code>
+                      <button
+                        onClick={copyWallet}
+                        style={{ flexShrink: 0, background: copySuccess ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', padding: '0.4rem 0.6rem', cursor: 'pointer', color: copySuccess ? '#10b981' : '#fff', fontSize: '0.75rem', transition: 'all 0.2s' }}
+                      >
+                        {copySuccess ? '✓ Kopyalandı' : '📋 Kopyala'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* TX ID Input */}
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>🔗 Blockchain TX Hash (İşlem Kimliği)</div>
+                    <input
+                      type="text"
+                      value={txId}
+                      onChange={(e) => setTxId(e.target.value)}
+                      placeholder="0x..."
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '10px', padding: '0.75rem 1rem', color: '#fff', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'monospace' }}
+                    />
+                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', marginTop: '0.4rem' }}>Ödeme yaptıktan sonra BscScan.com'dan TX Hash'inizi kopyalayın</div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <button
+                      className="button-primary"
+                      style={{ padding: '0.9rem', fontWeight: 700, background: 'linear-gradient(135deg, #10b981, #059669)', border: 'none', opacity: txId.trim().length > 0 ? 1 : 0.5 }}
+                      onClick={verifyAndDownload}
+                      disabled={txId.trim().length === 0}
+                    >
+                      ✅ Ödemeyi Doğrula & HD İndir
+                    </button>
+                    <button className="button-secondary" onClick={() => setShowPaymentModal(false)}>
+                      İptal Et
+                    </button>
+                  </div>
+                  <p style={{ textAlign: 'center', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)', marginTop: '1rem', marginBottom: 0 }}>
+                    TX Hash doğrulandıktan sonra HD görüntünüz otomatik indirilir
+                  </p>
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                  <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
+                  <h2 style={{ color: '#10b981', fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>Ödeme Doğrulandı!</h2>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: 0 }}>{paymentScale}x HD görüntünüz indiriliyor...</p>
+                </div>
+              )}
             </div>
           </div>
         )}
