@@ -643,9 +643,77 @@ export default function App() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                 }}>
                   <img src={activeItem.resultUrl} alt="Result without background" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </div>
+                 </div>
               </div>
             </div>
+
+            {/* HD Download Pricing Cards */}
+            <div style={{
+              width: '100%',
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(99, 102, 241, 0.08))',
+              border: '1px solid rgba(139, 92, 246, 0.25)',
+              borderRadius: '20px',
+              padding: '2rem',
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 800, color: '#000', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>
+                  ⭐ DESTEK OL &amp; HD İNDİR
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, marginBottom: '0.25rem' }}>
+                  Daha Yüksek Kalitede İndir
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0 }}>
+                  Projeye destek olun, HD kalitede indirin • Support &amp; Download HD
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {/* 2x Card */}
+                <div style={{ flex: '1 1 160px', maxWidth: '200px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '1.25rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, color: '#a78bfa' }}>2x</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>HD Kalite</div>
+                  <div>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$1</div>
+                    <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(1 * usdToTry).toFixed(0)} ₺</div>
+                  </div>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c3aed, #6366f1)', border: 'none', borderRadius: '10px' }} onClick={() => window.open(PREMIUM_LINKS[2], '_blank')}>
+                    Satın Al
+                  </button>
+                </div>
+
+                {/* 4x Card - Featured */}
+                <div style={{ flex: '1 1 160px', maxWidth: '200px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.08))', border: '2px solid rgba(245, 158, 11, 0.5)', borderRadius: '16px', padding: '1.25rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative' }}>
+                  <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: '#f59e0b', color: '#000', fontSize: '0.65rem', fontWeight: 800, padding: '3px 10px', borderRadius: '10px', whiteSpace: 'nowrap' }}>🔥 POPÜLER</div>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, color: '#f59e0b' }}>4x</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Ultra HD</div>
+                  <div>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$1.5</div>
+                    <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(1.5 * usdToTry).toFixed(0)} ₺</div>
+                  </div>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', borderRadius: '10px', color: '#000', fontWeight: 700 }} onClick={() => window.open(PREMIUM_LINKS[4], '_blank')}>
+                    Satın Al
+                  </button>
+                </div>
+
+                {/* 8x Card */}
+                <div style={{ flex: '1 1 160px', maxWidth: '200px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '1.25rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>8x</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Maksimum HD</div>
+                  <div>
+                    <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#fff' }}>$2</div>
+                    <div style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 600 }}>≈ {(2 * usdToTry).toFixed(0)} ₺</div>
+                  </div>
+                  <button className="button-primary" style={{ padding: '0.6rem 0.75rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none', borderRadius: '10px' }} onClick={() => window.open(PREMIUM_LINKS[8], '_blank')}>
+                    Satın Al
+                  </button>
+                </div>
+              </div>
+
+              <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', marginTop: '1rem', marginBottom: 0 }}>
+                💱 1 USD = {usdToTry.toFixed(2)} ₺ (anlık kur) • Ödeme Iyzico üzerinden güvenli
+              </p>
+            </div>
+
           </div>
         )}
 
