@@ -128,6 +128,8 @@ const AdSense = ({ slot, style }: { slot: string; style?: React.CSSProperties })
 
 // BEP20 USDT Ödeme Konfigürasyonu
 const USDT_WALLET = "0xaafb2b64355c2791af30a13f4da18f5081d1bb83"; // BEP20 USDT Cüzdan Adresi
+const USDT_CONTRACT = "0x55d398326f99059ff775485246999027b3197955"; // USDT (BEP20) Kontrat Adresi
+const BSCSCAN_API_KEY = "YourApiKeyToken"; // → bscscan.com'dan ücretsiz API key alın
 
 const PREMIUM_PRICES: Record<number, number> = {
   2: 1,
@@ -163,6 +165,8 @@ export default function App() {
   const [txId, setTxId] = useState('');
   const [txVerified, setTxVerified] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -413,6 +417,8 @@ export default function App() {
     setTxId('');
     setTxVerified(false);
     setCopySuccess(false);
+    setVerifyError('');
+    setIsVerifying(false);
     setShowPaymentModal(true);
   };
 
@@ -423,43 +429,128 @@ export default function App() {
     });
   };
 
+  // Real BSC blockchain TX verification
   const verifyAndDownload = async () => {
-    // BEP20 TX hash: 0x + 64 hex characters = 66 chars
-    const isBscTx = /^0x[a-fA-F0-9]{64}$/.test(txId.trim());
-    if (!isBscTx) {
-      alert('Geçersiz TX Hash! BEP20 işlem hash\'i 0x ile başlar ve 66 karakter uzunluğundadır.\n\nInvalid TX Hash! BEP20 transaction hash starts with 0x and is 66 characters long.');
+    const hash = txId.trim();
+    // Format check
+    if (!/^0x[a-fA-F0-9]{64}$/.test(hash)) {
+      setVerifyError('Geçersiz TX Hash! 0x ile başlayan 66 karakterli BSC işlem hash\'ini girin.');
       return;
     }
-    setTxVerified(true);
-    // Trigger the actual HD download
-    if (!activeItem) return;
-    const url = activeItem.resultUrl;
-    const scale = paymentScale;
-    try {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = url;
-      await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const scaledUrl = URL.createObjectURL(blob);
-            triggerDownload(scaledUrl, `transparent-${scale}x.png`);
-            setTimeout(() => URL.revokeObjectURL(scaledUrl), 5000);
-          }
-        }, 'image/png', 1.0);
-      }
-    } catch {
-      triggerDownload(url, `transparent-${scale}x.png`);
+    // Prevent re-use of same TX hash
+    const usedTxKey = `used_tx_${hash.toLowerCase()}`;
+    if (localStorage.getItem(usedTxKey)) {
+      setVerifyError('Bu TX Hash daha önce kullanılmıştır. Her işlem için yeni bir TX hash gereklidir.');
+      return;
     }
-    setTimeout(() => setShowPaymentModal(false), 2000);
+
+    setIsVerifying(true);
+    setVerifyError('');
+
+    try {
+      // Step 1: Get transaction from BSC
+      const txRes = await fetch(
+        `https://api.bscscan.com/api?module=proxy&action=eth_getTransactionByHash&txhash=${hash}&apikey=${BSCSCAN_API_KEY}`
+      );
+      const txData = await txRes.json();
+
+      if (!txData.result || txData.result === null) {
+        setVerifyError('İşlem bulunamadı. TX Hash\'in doğru olduğundan ve BSC ağında olduğundan emin olun.');
+        setIsVerifying(false);
+        return;
+      }
+
+      const tx = txData.result;
+
+      // Step 2: Verify it's a USDT transfer (to = USDT contract address)
+      if (tx.to?.toLowerCase() !== USDT_CONTRACT) {
+        setVerifyError('Bu işlem USDT transferi değil. BEP20 USDT (BSC ağı) gönderdiğinizden emin olun.');
+        setIsVerifying(false);
+        return;
+      }
+
+      // Step 3: Decode input data — transfer(address,uint256) = 0xa9059cbb
+      const input: string = tx.input || '';
+      if (!input.startsWith('0xa9059cbb') || input.length < 138) {
+        setVerifyError('Geçersiz transfer fonksiyonu. USDT transfer işlemi bekleniyor.');
+        setIsVerifying(false);
+        return;
+      }
+
+      // Recipient: bytes 4-36 of input (32 bytes, take last 20 = address)
+      const recipientHex = input.slice(10, 74);
+      const recipient = '0x' + recipientHex.slice(24).toLowerCase();
+
+      // Amount: bytes 36-68 of input (32 bytes = uint256)
+      const amountHex = input.slice(74, 138);
+      const amount = BigInt('0x' + amountHex);
+
+      // Step 4: Check recipient = our wallet
+      if (recipient !== USDT_WALLET.toLowerCase()) {
+        setVerifyError(`Yanlış cüzdan! Lütfen ${USDT_WALLET} adresine gönderin.`);
+        setIsVerifying(false);
+        return;
+      }
+
+      // Step 5: Check amount (USDT on BSC = 18 decimals)
+      const expectedAmount = BigInt(Math.floor(PREMIUM_PRICES[paymentScale] * 1e15)) * BigInt(1000);
+      if (amount < expectedAmount) {
+        const sentUsdt = Number(amount) / 1e18;
+        setVerifyError(`Yetersiz miktar! Gönderilen: ${sentUsdt.toFixed(4)} USDT, Gereken: ${PREMIUM_PRICES[paymentScale]} USDT`);
+        setIsVerifying(false);
+        return;
+      }
+
+      // Step 6: Check receipt (confirmed)
+      const rcptRes = await fetch(
+        `https://api.bscscan.com/api?module=proxy&action=eth_getTransactionReceipt&txhash=${hash}&apikey=${BSCSCAN_API_KEY}`
+      );
+      const rcptData = await rcptRes.json();
+      if (!rcptData.result || rcptData.result.status !== '0x1') {
+        setVerifyError('İşlem henüz onaylanmamış. Lütfen birkaç dakika bekleyip tekrar deneyin.');
+        setIsVerifying(false);
+        return;
+      }
+
+      // ✅ All checks passed — mark TX as used and trigger download
+      localStorage.setItem(usedTxKey, '1');
+      setTxVerified(true);
+      setIsVerifying(false);
+
+      if (!activeItem) return;
+      const url = activeItem.resultUrl;
+      const scale = paymentScale;
+      try {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = url;
+        await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; });
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const scaledUrl = URL.createObjectURL(blob);
+              triggerDownload(scaledUrl, `transparent-${scale}x.png`);
+              setTimeout(() => URL.revokeObjectURL(scaledUrl), 5000);
+            }
+          }, 'image/png', 1.0);
+        }
+      } catch {
+        triggerDownload(url, `transparent-${scale}x.png`);
+      }
+      setTimeout(() => setShowPaymentModal(false), 3000);
+
+    } catch (err) {
+      console.error('BSC verification error:', err);
+      setVerifyError('Blockchain bağlantı hatası. İnternet bağlantınızı kontrol edin ve tekrar deneyin.');
+      setIsVerifying(false);
+    }
   };
 
   return (
